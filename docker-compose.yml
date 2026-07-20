@@ -1,0 +1,63 @@
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      # override .env (yang default-nya localhost untuk dev) supaya nunjuk ke service Node
+      WA_GATEWAY_URL: http://wa-gateway:3001
+      # Database dari .env root — ganti DB cukup di sana (lokal / Supabase / eksternal).
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL wajib diisi di file .env (root)}
+    expose:
+      - "8000"
+    depends_on:
+      - wa-gateway
+    restart: unless-stopped
+
+  wa-gateway:
+    build: ./wa-gateway
+    env_file: ./wa-gateway/.env
+    environment:
+      # 3 nilai ini HARUS sama dengan backend/.env
+      WEBHOOK_URL: http://backend:8000/api/v1/wa/webhook
+      WA_INTERNAL_TOKEN: change-me-internal-token
+      WEBHOOK_SECRET: change-me-webhook-secret
+    volumes:
+      - wa-auth:/app/auth   # persist sesi WhatsApp (creds) antar restart
+    expose:
+      - "3001"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Postgres LOKAL — hanya jalan kalau COMPOSE_PROFILES=localdb (lihat .env).
+  # Pakai Supabase/eksternal? Kosongkan COMPOSE_PROFILES; service ini tidak jalan.
+  db:
+    image: postgres:16-alpine
+    profiles: ["localdb"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wa_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wa_password}
+      POSTGRES_DB: ${POSTGRES_DB:-wa_gateway}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    # port di-expose ke host biar bisa diintip pakai DBeaver/psql (opsional).
+    # Default 5433 supaya tidak bentrok dgn Postgres lain di host (yg pakai 5432).
+    # Backend konek lewat jaringan Docker (db:5432), tak terpengaruh port host ini.
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wa_user} -d ${POSTGRES_DB:-wa_gateway}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  wa-auth:
+  pg-data:

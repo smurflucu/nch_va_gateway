@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(npm --version)",
+      "Bash(py --version)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/docs)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/openapi.json)",
+      "Bash(curl -s -X POST http://localhost:8080/api/v1/auth/register -H \"Content-Type: application/json\" -d '{\"email\":\"admin@local.test\",\"password\":\"admin1234\",\"full_name\":\"Admin\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:8080/api/v1/auth/register -H \"Content-Type: application/json\" -d '{\"email\":\"admin@wagateway.com\",\"password\":\"admin1234\",\"full_name\":\"Admin\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:8080/api/v1/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@wagateway.com\",\"password\":\"admin1234\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(docker exec *)",
+      "Bash(npm view *)",
+      "Bash(python rbac_test.py)",
+      "Bash(curl -s -o /dev/null -w \"app -> HTTP %{http_code}\\\\n\" http://localhost:8080/)",
+      "Bash(python -c ' *)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(curl -s http://localhost:8080/openapi.json)",
+      "Bash(python -c \"import sys,json; print\\('API title:', json.load\\(sys.stdin\\)['info']['title']\\)\")",
+      "Bash(curl -s -o /dev/null -w \"register probe -> HTTP %{http_code}\\\\n\" -X POST http://localhost:8080/api/v1/users/me)",
+      "Bash(docker exec wa-backend-1 python -c ' *)"
+    ]
+  }
+}
