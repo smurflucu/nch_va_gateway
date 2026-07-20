@@ -16,3 +16,6 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+
+# Claude Code (config & izin lokal — jangan di-commit)
+.claude/
